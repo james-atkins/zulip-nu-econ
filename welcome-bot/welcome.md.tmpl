@@ -1,0 +1,93 @@
+# Hello {{ name }}
+
+Welcome to the Northwestern Economics and Kellogg School of Management PhD Student Zulip! :wave:
+
+The goal of this platform is to create an environment that allows graduate students to join discussions about their research interests and courses, and more broadly to assist collaboration within the Northwestern Economics community. We want to avoid a proliferation of ad hoc email lists, WhatsApp, Slack, Discord etc groups that are not easy to discover and join, and risk us missing out working with people with similar interests.
+
+I am Adam Smith, the invisible hand behind this Zulip.
+
+{% if auto_field_streams | length > 0 %}
+Based on your research interests, I've added you to the following streams:
+
+{% for stream in auto_field_streams %}
+* #**{{ stream }}**
+{% endfor %}
+{% else %}
+
+{% if student.is_kellogg() %}
+Sorry, at the momment I can only get the research interests of Economics PhD students, not Kellogg. You will have to manually subscribe to the streams of your fields of interest.
+{% endif %}
+
+{% endif %}
+
+{% if student.year == 1 %}
+As you appear to be a first year, I've also added you to the streams for the core Economics courses:
+
+* :eddie: #**course/ECON 410-1** 
+* :larry: #**course/ECON 411-1** 
+* :joel: #**course/ECON 480-1** 
+{% endif %}
+
+---
+
+# What is Zulip?
+
+Zulip is a team chat app, similar to Slack. Unlike Slack, it is free for academic usage. Zulip's key feature is topics: topics are light-weight subjects, similar to the subject line of an email. In Zulip, *streams* (channels in Slack) determine who receives a message while *topics* tell you what the message is about. You can more about streams and topics [here](https://zulip.com/help/streams-and-topics).
+
+Zulip works best when each conversation has its own topic. When you have something new to say, simply start a new topic! For example `pset2 q3` is a good topic if you are struggling with a problem set question and want some hints from your classmates. Or `acemoglu mistrust misperception and misunderstanding` is a good topic for discussing yet another Acemoglu working paper.
+
+Messages can be reassigned to different streams and topics ex-post. Please do this if you see that conversions are becoming off-topic.
+
+---
+
+# Field Streams
+
+Each field has a separate stream. Please add yourself to streams of your fields of interest.
+
+{% if student.fields | length > 0 %}
+From your profile on the department website, I've automatically added you the following streams:
+
+{% for stream in auto_field_streams %}
+* #**{{ stream }}**
+{% endfor %}
+
+If there are more fields that you are interested in, please feel free to add yourself.
+{% endif %}
+
+These are the available field streams:
+
+{% for stream in field_streams %}
+* #**{{ stream }}**
+{% endfor %}
+
+If your field is missing a stream, then please add one under the "field/" prefix.
+
+---
+
+# Course Streams
+
+{% if student.year == 1 %}
+As you appear to be a first year, I've added you to the streams for the core Economics courses.
+{% else %}
+These are the available course streams:
+
+{% for stream in course_streams %}
+* #**{{ stream }}**
+{% endfor %}
+
+Please add yourself to streams of the courses that you are taking or auditing.
+{% endif %}
+
+---
+
+# Other Streams
+
+You are automatically added to these streams but you may unsubscribe if you wish:
+
+* #**general** - general announcements. Field specific announcements should go in the relevant field stream
+* #**random** - non-economics related exchanges: planning a party, suggesting a BBQ, discussing the weather or sports etc...
+
+In addition you may choose to join the following:
+
+* #**freefood** - let Kellogg subsidise your food consumption :food:
+
