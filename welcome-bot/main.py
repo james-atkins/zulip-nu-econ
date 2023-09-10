@@ -98,10 +98,10 @@ def welcome_new_user(client, students: List[GradStudent], user_id: int, name: st
 
     all_streams = [stream["name"] for stream in resp["streams"]]
 
-    auto_field_streams = []
     course_streams = [ stream for stream in all_streams if stream.startswith("course/")]
     field_streams = [ stream for stream in all_streams if stream.startswith("field/")]
 
+    auto_field_streams = []
     # Try and find user on the department website
     student = _find_grad_student(students, name, email)
     if student:
@@ -115,6 +115,19 @@ def welcome_new_user(client, students: List[GradStudent], user_id: int, name: st
 
         if resp["result"] != "success":
             raise ZulipError(resp["msg"])
+
+        if student.year == 1:
+            # Register first year class streams automatically
+            # TODO: this should choose the correct course depending on the time of the year
+            FIRST_YEAR_COURSES_STREAMS = ["course/ECON 410-1", "course/ECON 411-1", "course/ECON 480-1"]
+
+            resp = client.add_subscriptions(
+                streams=[{"name": stream} for stream in FIRST_YEAR_COURSES_STREAMS],
+                principals=[user_id],
+            )
+
+            if resp["result"] != "success":
+                raise ZulipError(resp["msg"])
 
     with open(os.path.join(os.path.dirname(__file__), "welcome.md.tmpl")) as f:
         template = jinja2.Template(f.read(), autoescape=True)
