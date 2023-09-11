@@ -8,7 +8,7 @@
 
 {% if student %}
 
-{% if auto_streams %}
+{% if student and auto_streams %}
 :magic: You seem to be in Year {{ student.year }} of the PhD. Based on this and your research interests, you've been automatically added to the following streams: {{ auto_streams | map('format_stream') | join(', ') }}.
 {% endif %}
 
@@ -49,12 +49,12 @@ These are the available field streams that you can join:
 
 :idea: If your field is missing a stream, then please add one under the "field/" prefix or post a request in the #**zulip** stream.
 
-{% if 1 <= student.year and student.year <= 3 %}
+{% if not student or (1 <= student.year and student.year <= 3) %}
 ---
 
 # :book: Course Streams :book:
 
-{% if student.year == 1 %}
+{% if student and student.year == 1 %}
 As you appear to be a first year, you've been added to the streams for the core Economics courses: {{ auto_course_streams | map('format_stream') | join(', ') }}.
 {% else %}
 
