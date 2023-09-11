@@ -206,12 +206,10 @@ if __name__ == "__main__":
             nu_email = person["delivery_email"]  # the actual email address used to register
 
             try:
-                welcome_new_user(user_id, name, nu_email)
+                welcome_new_user(client, template, students, user_id, name, nu_email)
                 print(f"Registered {nu_email}")
             except Exception as e:
                 print(e, file=sys.stderr)
 
     client.call_on_each_event(handle_event, event_types=["realm_user"])
-
-    # welcome_new_user(client, template, students, "JamesAtkins@u.northwestern.edu", "James Atkins", "JamesAtkins@u.northwestern.edu")
     
