@@ -1,93 +1,89 @@
-# Hello {{ name }}
+#  Welcome to the Northwestern Economics and Kellogg PhD Student Zulip! :partying_face:
 
-Welcome to the Northwestern Economics and Kellogg School of Management PhD Student Zulip! :wave:
+:wave: Hey {{ name }}!
 
-The goal of this platform is to create an environment that allows graduate students to join discussions about their research interests and courses, and more broadly to assist collaboration within the Northwestern Economics community. We want to avoid a proliferation of ad hoc email lists, WhatsApp, Slack, Discord etc groups that are not easy to discover and join, and risk us missing out working with people with similar interests.
+:bulls_eye: The goal of this platform is to create an environment that allows graduate students to discuss and explore their research interests, and more broadly to assist collaboration within the Northwestern Economics community.
 
-I am Adam Smith, the invisible hand behind this Zulip.
+:cross_mark: We want to avoid a proliferation of ad hoc email lists, WhatsApp, Slack, Discord etc groups that are not easy to discover and join, and risk us missing out working with people with similar interests.
 
-{% if auto_field_streams | length > 0 %}
-Based on your research interests, I've added you to the following streams:
+{% if student %}
 
-{% for stream in auto_field_streams %}
-* #**{{ stream }}**
-{% endfor %}
+{% if auto_streams %}
+:magic: You seem to be in Year {{ student.year }} of the PhD. Based on this and your research interests, you've been automatically added to the following streams: {{ auto_streams | map('format_stream') | join(', ') }}.
+{% endif %}
+
 {% else %}
-
-{% if student.is_kellogg() %}
-Sorry, at the momment I can only get the research interests of Economics PhD students, not Kellogg. You will have to manually subscribe to the streams of your fields of interest.
-{% endif %}
-
-{% endif %}
-
-{% if student.year == 1 %}
-As you appear to be a first year, I've also added you to the streams for the core Economics courses:
-
-* :eddie: #**course/ECON 410-1** 
-* :larry: #**course/ECON 411-1** 
-* :joel: #**course/ECON 480-1** 
+:oops: I can't match you to your student profile. Perhaps you are in Kellogg? Currently I can only get the profiles of Economics PhD students. You will have to manually subscribe to your field and course streams. Find them below!
 {% endif %}
 
 ---
 
-# What is Zulip?
+# :thinking: What is Zulip? :thinking:
 
-Zulip is a team chat app, similar to Slack. Unlike Slack, it is free for academic usage. Zulip's key feature is topics: topics are light-weight subjects, similar to the subject line of an email. In Zulip, *streams* (channels in Slack) determine who receives a message while *topics* tell you what the message is about. You can more about streams and topics [here](https://zulip.com/help/streams-and-topics).
+Zulip is a team chat app, similar to Slack. Unlike Slack, it is free for academic usage. Zulip's key feature is topics: topics are light-weight subjects, similar to the subject line of an email. In Zulip, *streams* (for example #**field/io**) determine who receives a message while *topics* tell you what the message is about. For more details, check out the [guide](https://zulip.com/help/streams-and-topics).
 
 Zulip works best when each conversation has its own topic. When you have something new to say, simply start a new topic! For example `pset2 q3` is a good topic if you are struggling with a problem set question and want some hints from your classmates. Or `acemoglu mistrust misperception and misunderstanding` is a good topic for discussing yet another Acemoglu working paper.
 
-Messages can be reassigned to different streams and topics ex-post. Please do this if you see that conversions are becoming off-topic.
+:idea: Messages can be reassigned to different streams and topics ex-post. Please do this if you see that conversions are veering off-topic.
 
 ---
 
-# Field Streams
+# :sparkles: Field Streams :sparkles:
 
-Each field has a separate stream. Please add yourself to streams of your fields of interest.
+Each field has their own stream. This allows the macroeconomists to share macro events in #**field/macro** without annoying the micro theorists in #**field/microtheory**.
 
-{% if student.fields | length > 0 %}
-From your profile on the department website, I've automatically added you the following streams:
+:calendar: Weekly and daily summaries of upcoming events will be posted to each field's stream.
 
-{% for stream in auto_field_streams %}
-* #**{{ stream }}**
-{% endfor %}
+{% if auto_field_streams %}
+:magic: You've been automatically added to: {{ auto_field_streams | map('format_stream') | join(', ') }}.
 
-If there are more fields that you are interested in, please feel free to add yourself.
+If you're into more fields, feel free to join them too! Here are your options:
+{% else %}
+These are the available field streams that you can join:
 {% endif %}
 
-These are the available field streams:
-
 {% for stream in field_streams %}
-* #**{{ stream }}**
+* {{ stream | format_stream }}
 {% endfor %}
 
-If your field is missing a stream, then please add one under the "field/" prefix.
 
+:idea: If your field is missing a stream, then please add one under the "field/" prefix or post a request in the #**zulip** stream.
+
+{% if 1 <= student.year and student.year <= 3 %}
 ---
 
-# Course Streams
+# :book: Course Streams :book:
 
 {% if student.year == 1 %}
-As you appear to be a first year, I've added you to the streams for the core Economics courses.
+As you appear to be a first year, you've been added to the streams for the core Economics courses: {{ auto_course_streams | map('format_stream') | join(', ') }}.
 {% else %}
+
 These are the available course streams:
 
 {% for stream in course_streams %}
-* #**{{ stream }}**
+* {{ stream | format_stream }}
 {% endfor %}
 
-Please add yourself to streams of the courses that you are taking or auditing.
+
+:thank_you: Please add yourself to streams of the courses that you are taking or auditing.
 {% endif %}
 
+{% endif %}
 ---
 
 # Other Streams
 
 You are automatically added to these streams but you may unsubscribe if you wish:
 
-* #**general** - general announcements. Field specific announcements should go in the relevant field stream
-* #**random** - non-economics related exchanges: planning a party, suggesting a BBQ, discussing the weather or sports etc...
+* :megaphone: #**general** - general announcements (specific ones go to relevant field streams)
+* :cyclone: #**random** - random exchanges: departmental gossip, suggesting a BBQ, discussing the weather, sports and more!
+* :octopus: #**zulip** - questions, requests, ideas etc for the Zulip
 
-In addition you may choose to join the following:
+And for a tasty bonus:
 
-* #**freefood** - let Kellogg subsidise your food consumption :food:
+* :food: #**freefood** - let Kellogg subsidise your food consumption
+
+:working_on_it: Feel free to create your own streams! If you are doing so, please choose a name that fits into the current structure, for example prefixed by `field/`, `course/` or `office/`. Where possible, please make streams public so anyone interested may join.
+
+:speech_balloon: If you have any questions, please ask!
 

@@ -22,6 +22,14 @@ class GradStudent:
         return self.email.endswith("@kellogg.northwestern.edu")
 
 
+FIRST_YEAR_COURSES_STREAMS = ["course/ECON 410-1", "course/ECON 411-1", "course/ECON 480-1"]
+
+STREAM_EMOJIS = {
+    "course/ECON 410-1": "eddie",
+    "course/ECON 411-1": "larry",
+    "course/ECON 480-1": "joel",
+}
+
 FIELD_STREAMS = {
     "Applied Microeconomics": "appliedmicro",
     "Econometrics": "econometrics",
@@ -91,7 +99,7 @@ def _website_fields_to_streams(fields):
     return streams
 
 
-def welcome_new_user(client, students: List[GradStudent], user_id: int, name: str, email: str):
+def welcome_new_user(client, template: jinja2.Template, students: List[GradStudent], user_id: int, name: str, email: str):
     resp = client.get_streams()
     if resp["result"] != "success":
         raise ZulipError(resp["msg"])
@@ -101,48 +109,48 @@ def welcome_new_user(client, students: List[GradStudent], user_id: int, name: st
     course_streams = [ stream for stream in all_streams if stream.startswith("course/")]
     field_streams = [ stream for stream in all_streams if stream.startswith("field/")]
 
-    auto_field_streams = []
+    # Streams that the user will be automatically added to
+    auto_streams = []
+
     # Try and find user on the department website
     student = _find_grad_student(students, name, email)
     if student:
-        auto_field_streams = _website_fields_to_streams(student.fields)
-
-        # Try and register the user to their field streams
-        resp = client.add_subscriptions(
-            streams=[{"name": stream} for stream in auto_field_streams],
-            principals=[user_id],
-        )
-
-        if resp["result"] != "success":
-            raise ZulipError(resp["msg"])
+        auto_streams.extend(_website_fields_to_streams(student.fields))
 
         if student.year == 1:
-            # Register first year class streams automatically
-            # TODO: this should choose the correct course depending on the time of the year
-            FIRST_YEAR_COURSES_STREAMS = ["course/ECON 410-1", "course/ECON 411-1", "course/ECON 480-1"]
+            auto_streams.extend(FIRST_YEAR_COURSES_STREAMS)
 
-            resp = client.add_subscriptions(
-                streams=[{"name": stream} for stream in FIRST_YEAR_COURSES_STREAMS],
-                principals=[user_id],
-            )
+    # Try and register the user to their field and course streams
+    resp = client.add_subscriptions(
+        streams=[{"name": stream} for stream in auto_streams],
+        principals=[user_id],
+    )
 
-            if resp["result"] != "success":
-                raise ZulipError(resp["msg"])
+    if resp["result"] != "success":
+        raise ZulipError(resp["msg"])
 
-    with open(os.path.join(os.path.dirname(__file__), "welcome.md.tmpl")) as f:
-        template = jinja2.Template(f.read(), autoescape=True)
-        welcome = template.render(
-            name=name, 
-            course_streams=course_streams,
-            field_streams=field_streams,
-            auto_field_streams=auto_field_streams,
-            student=student,
-        )
+    welcome = template.render(
+        name=name, 
+        course_streams=course_streams,
+        field_streams=field_streams,
+        auto_streams=auto_streams,
+        auto_field_streams=[stream for stream in auto_streams if stream.startswith("field/")],
+        auto_course_streams=[stream for stream in auto_streams if stream.startswith("course/")],
+        student=student,
+    )
 
     resp = client.send_message({"type": "direct", "to": user_id, "content": welcome})
     if resp["result"] != "success":
         raise ZulipError(resp["msg"])
-    
+
+
+def _stream_filter(value):
+    emoji = STREAM_EMOJIS.get(value)
+    if emoji:
+        return f":{emoji}: #**{value}**"
+
+    return f"#**{value}**"
+
 
 def _find_grad_student(students: List[GradStudent], name: str, email: str) -> GradStudent:
     # Try first with the NU email
@@ -169,25 +177,41 @@ def _find_grad_student(students: List[GradStudent], name: str, email: str) -> Gr
     return None
 
 
-def handle_event(event: Dict[str, Any]) -> None:
-    if event["type"] == "realm_user" and event["op"] == "add":
-        person = event["person"]
-        
-        if person["is_bot"]:
-            return
-        
-        user_id = person["user_id"]
-        name = person["full_name"]
-        nu_email = person["delivery_email"]  # the actual email address used to register
-
-        try:
-            welcome_new_user(user_id, name, nu_email)
-        except Exception as e:
-            print(e, file=sys.stderr)
-
-
 if __name__ == "__main__":
     students = scrape_grad_students()
-    client = zulip.Client(config_file="~/zuliprc")
+    config_file = os.getenv("ZULIP_RC")
+    if config_file is None:
+        print("error: could not find configuration file", file=sys.stderr)
+        sys.exit(1)
 
+    client = zulip.Client(config_file=config_file)
+
+    env = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+        autoescape=True,
+    )
+    env.filters["format_stream"] = _stream_filter
+
+    template = env.get_template("welcome.md.tmpl")
+
+    def handle_event(event: Dict[str, Any]) -> None:
+        if event["type"] == "realm_user" and event["op"] == "add":
+            person = event["person"]
+        
+            if person["is_bot"]:
+                return
+        
+            user_id = person["user_id"]
+            name = person["full_name"]
+            nu_email = person["delivery_email"]  # the actual email address used to register
+
+            try:
+                welcome_new_user(user_id, name, nu_email)
+                print(f"Registered {nu_email}")
+            except Exception as e:
+                print(e, file=sys.stderr)
+
+    client.call_on_each_event(handle_event, event_types=["realm_user"])
+
+    # welcome_new_user(client, template, students, "JamesAtkins@u.northwestern.edu", "James Atkins", "JamesAtkins@u.northwestern.edu")
     
