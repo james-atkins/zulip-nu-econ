@@ -49,6 +49,11 @@ FIELD_STREAMS = {
 }
 
 
+class ZulipError(Exception):
+    pass
+
+
+
 def scrape_grad_students() -> List[GradStudent]:
     resp = requests.get("https://economics.northwestern.edu/people/graduate/index.html", timeout=5)
     resp.raise_for_status()
