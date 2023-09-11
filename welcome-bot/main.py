@@ -144,7 +144,7 @@ def welcome_new_user(client, template: jinja2.Template, students: List[GradStude
         student=student,
     )
 
-    resp = client.send_message({"type": "direct", "to": user_id, "content": welcome})
+    resp = client.send_message({"type": "direct", "to": [user_id], "content": welcome})
     if resp["result"] != "success":
         raise ZulipError(f"cannot send user message: {resp['msg']}")
 
