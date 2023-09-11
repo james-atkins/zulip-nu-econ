@@ -107,7 +107,7 @@ def _website_fields_to_streams(fields):
 def welcome_new_user(client, template: jinja2.Template, students: List[GradStudent], user_id: int, name: str, email: str):
     resp = client.get_streams()
     if resp["result"] != "success":
-        raise ZulipError(resp["msg"])
+        raise ZulipError(f"cannot get streams: {resp['msg']}")
 
     all_streams = [stream["name"] for stream in resp["streams"]]
 
@@ -132,7 +132,7 @@ def welcome_new_user(client, template: jinja2.Template, students: List[GradStude
     )
 
     if resp["result"] != "success":
-        raise ZulipError(resp["msg"])
+        raise ZulipError(f"cannot register user to streams: {resp['msg']}")
 
     welcome = template.render(
         name=name, 
@@ -146,7 +146,7 @@ def welcome_new_user(client, template: jinja2.Template, students: List[GradStude
 
     resp = client.send_message({"type": "direct", "to": user_id, "content": welcome})
     if resp["result"] != "success":
-        raise ZulipError(resp["msg"])
+        raise ZulipError(f"cannot send user message: {resp['msg']}")
 
 
 def _stream_filter(value):
