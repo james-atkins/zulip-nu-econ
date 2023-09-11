@@ -8,8 +8,10 @@
 
 {% if student %}
 
-{% if student and auto_streams %}
+{% if auto_streams %}
 :magic: You seem to be in Year {{ student.year }} of the PhD. Based on this and your research interests, you've been automatically added to the following streams: {{ auto_streams | map('format_stream') | join(', ') }}.
+{% else %}
+:oops: You seem to be in Year {{ student.year }} of the PhD but I haven't been able to add you any streams automatically. Sorry, you will have to do this yourself. Find information on field and course streams below!
 {% endif %}
 
 {% else %}
@@ -47,7 +49,7 @@ These are the available field streams that you can join:
 {% endfor %}
 
 
-:idea: If your field is missing a stream, then please add one under the "field/" prefix or post a request in the #**zulip** stream.
+:idea: If your field is missing a stream, then please add one under the `field/` prefix or post a request in the #**zulip** stream.
 
 {% if not student or (1 <= student.year and student.year <= 3) %}
 ---
@@ -85,5 +87,4 @@ And for a tasty bonus:
 
 :working_on_it: Feel free to create your own streams! If you are doing so, please choose a name that fits into the current structure, for example prefixed by `field/`, `course/` or `office/`. Where possible, please make streams public so anyone interested may join.
 
-:speech_balloon: If you have any questions, please ask!
-
+:speech_balloon: If you have any questions, please ask in the #**zulip** stream!
