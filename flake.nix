@@ -20,7 +20,11 @@
       devShells = forAllSystems (system: {
         default = with pkgs.${system}; mkShell {
           nativeBuildInputs = [
-            (python3.withPackages (ps: with ps; [ beautifulsoup4 lxml jinja2 requests zulip ]))
+            (python3.withPackages (ps: with ps; [
+              beautifulsoup4 lxml jinja2 pytz requests zulip
+              types-requests types-pytz
+              python-lsp-server ruff-lsp pylsp-rope pylsp-mypy
+            ]))
           ];
         };
       });
