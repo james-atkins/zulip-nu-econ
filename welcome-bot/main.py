@@ -119,10 +119,10 @@ def welcome_new_user(client, template: jinja2.Template, students: List[GradStude
     # Try and find user on the department website
     student = _find_grad_student(students, name, email)
     if student:
-        auto_streams.extend(_website_fields_to_streams(student.fields))
-
         if student.year == 1:
             auto_streams.extend(FIRST_YEAR_COURSES_STREAMS)
+        else:
+            auto_streams.extend(_website_fields_to_streams(student.fields))
 
     # Try and register the user to their field and course streams
     resp = client.add_subscriptions(
