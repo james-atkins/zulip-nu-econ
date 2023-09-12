@@ -2,7 +2,7 @@ import os
 import re
 import sys
 from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import zulip
 
@@ -32,7 +32,6 @@ STREAM_EMOJIS = {
 
 FIELD_STREAMS = {
     "Applied Microeconomics": "appliedmicro",
-    "Econometrics": "econometrics",
     "Development": "development",
     "Econometrics": "metrics",
     "Economic History": "history",
@@ -70,7 +69,7 @@ def _extract_grad_student(soup: BeautifulSoup) -> GradStudent:
     year_text = p_year.text
     
     if not year_text.startswith("Year"):
-        raise ValueError(f"Invalid year {year}")
+        raise ValueError(f"Invalid year {year_text}")
     
     year = int(year_text.removeprefix("Year").strip())
     
@@ -157,7 +156,7 @@ def _stream_filter(value):
     return f"#**{value}**"
 
 
-def _find_grad_student(students: List[GradStudent], name: str, email: str) -> GradStudent:
+def _find_grad_student(students: List[GradStudent], name: str, email: str) -> Optional[GradStudent]:
     # Try first with the NU email
     for student in students:
         if student.email == email.lower():
