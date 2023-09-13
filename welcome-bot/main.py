@@ -181,6 +181,34 @@ def _find_grad_student(students: List[GradStudent], name: str, email: str) -> Op
     return None
 
 
+def send_missing_welcome_messages(client: zulip.Client, template: jinja2.Template, students: List[GradStudent]):
+    resp = client.get_members()
+    if resp["result"] != "success":
+        raise ZulipError(f"cannot get members: {resp['msg']}")
+
+    for member in resp["members"]:
+        if member["is_bot"] or not member["is_active"]:
+            continue
+
+        user_id = member["user_id"]
+        narrow = [{"operator": "dm", "operand": [user_id]}]
+
+        request = {"anchor": "newest", "num_after": 0, "num_before": 100, "narrow": narrow}
+        resp = client.get_messages(request)
+        if resp["result"] != "success":
+            raise ZulipError(f"cannot get messages: {resp['msg']}")
+
+        if not resp["messages"]:
+            user_id = member["user_id"]
+            name = member["full_name"]
+            nu_email = member["delivery_email"]  # the actual email address used to register
+            try:
+                welcome_new_user(client, template, students, user_id, name, nu_email)
+                print(f"Sent belated welcome message to {nu_email}")
+            except Exception as e:
+                print(e, file=sys.stderr)
+
+
 if __name__ == "__main__":
     students = scrape_grad_students()
     config_file = os.getenv("ZULIP_RC")
@@ -215,5 +243,6 @@ if __name__ == "__main__":
             except Exception as e:
                 print(e, file=sys.stderr)
 
+    send_missing_welcome_messages(client, template, students)
     client.call_on_each_event(handle_event, event_types=["realm_user"])
     
