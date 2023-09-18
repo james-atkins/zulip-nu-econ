@@ -4,7 +4,7 @@
 
 {% for event in events %}
 ## [{{ event.title }}]({{ event.url }})
-{{ event.start.strftime("%I:%M %p") }} ‒ {{ event.end.strftime("%I:%M %p") }} (<time:{{ event.start.isoformat() }}> ‒ <time:{{ event.start.isoformat() }}>)
+{{ event.start.strftime("%I:%M %p") }} ‒ {{ event.end.strftime("%I:%M %p") }} (<time:{{ event.start.isoformat() }}> ‒ <time:{{ event.end.isoformat() }}>)
 
 {% if event.description %}
 {{ event.description | safe }}
