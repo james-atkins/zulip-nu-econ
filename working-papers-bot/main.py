@@ -192,6 +192,9 @@ def make_messages(session: requests.Session) -> Iterator[dict[str, Any]]:
                 working_papers[working_paper.url] = working_paper
             time.sleep(SLEEP_TIME)
 
+        if not working_papers:
+            continue
+
         content = template.render(papers=working_papers.values())
 
         yield {
