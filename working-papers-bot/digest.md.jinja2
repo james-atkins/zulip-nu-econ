@@ -1,0 +1,16 @@
+# :sparkles: NBER Working Papers :sparkles:
+
+{% for paper in papers  -%}
+## :new: [{{ paper.title }}]({{ paper.url }})
+
+**Authors:** {% for author in paper.authors -%}
+	{%- if author.url %}[{{ author.name }}]({{ author.url }}){% else %}{{ author.name }}{% endif -%}
+	{%- if not loop.last %}, {% endif -%}
+{% endfor %}
+
+{{ paper.abstract }}...
+
+{% if not loop.last %}
+---
+{% endif %}
+{% endfor %}

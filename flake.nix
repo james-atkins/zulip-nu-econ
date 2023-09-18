@@ -51,6 +51,7 @@
             mkdir $out/bin
             ln -s $out/welcome-bot/main.py $out/bin/welcome-bot
             ln -s $out/events-bot/main.py $out/bin/events-bot
+            ln -s $out/working-papers-bot/main.py $out/bin/working-papers-bot
           '';
         }
       );
@@ -77,14 +78,14 @@
 
           cfg = config.nuzulip;
 
-          makeTimer = name: exec-start: on-calendar:
+          makeTimer = name: exec-start: zuliprc: on-calendar:
             {
               systemd.services."nuzulip-${name}" = {
                 after = [ "network.target" ];
                 serviceConfig = {
                   Type = "oneshot";
                   ExecStart = exec-start;
-                  LoadCredential = "zuliprc:${cfg.zuliprc.calendar-bot}";
+                  LoadCredential = "zuliprc:${zuliprc}";
                   Environment = "ZULIPRC=%d/zuliprc";
 
                   User = "zulip-bot";
@@ -116,6 +117,9 @@
             zuliprc.calendar-bot = lib.mkOption {
               type = lib.types.path;
             };
+            zuliprc.working-papers-bot = lib.mkOption {
+              type = lib.types.path;
+            };
           };
           config = lib.mkIf cfg.enable (lib.mkMerge [
             {
@@ -138,8 +142,9 @@
                 };
               };
             }
-            (makeTimer "events-daily" "${nuzulip'}/bin/events-bot daily" "08:00")
-            (makeTimer "events-weekly" "${nuzulip'}/bin/events-bot weekly" "Mon 08:00")
+            (makeTimer "events-daily" "${nuzulip'}/bin/events-bot daily" cfg.zuliprc.calendar-bot "08:00")
+            (makeTimer "events-weekly" "${nuzulip'}/bin/events-bot weekly" cfg.zuliprc.calendar-bot "Mon 08:00")
+            (makeTimer "nber-working-papers" "${nuzulip'}/bin/working-papers-bot" cfg.zuliprc.working-papers-bot "Mon 08:00")
           ]);
         };
     };
