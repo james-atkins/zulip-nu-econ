@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 import re
 import sys
@@ -211,7 +213,7 @@ def send_missing_welcome_messages(client: zulip.Client, template: jinja2.Templat
 
 if __name__ == "__main__":
     students = scrape_grad_students()
-    config_file = os.getenv("ZULIP_RC")
+    config_file = os.getenv("ZULIPRC")
     if config_file is None:
         print("error: could not find configuration file", file=sys.stderr)
         sys.exit(1)
@@ -219,12 +221,12 @@ if __name__ == "__main__":
     client = zulip.Client(config_file=config_file)
 
     env = jinja2.Environment(
-        loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+        loader=jinja2.FileSystemLoader(os.path.dirname(os.path.realpath(__file__))),
         autoescape=True,
     )
     env.filters["format_stream"] = _stream_filter
 
-    template = env.get_template("welcome.md.tmpl")
+    template = env.get_template("welcome.md.jinja2")
 
     def handle_event(event: Dict[str, Any]) -> None:
         if event["type"] == "realm_user" and event["op"] == "add":

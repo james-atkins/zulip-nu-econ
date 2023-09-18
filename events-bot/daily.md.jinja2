@@ -1,0 +1,16 @@
+# :spiral_calendar: Today's Events :spiral_calendar:
+
+---
+
+{% for event in events %}
+## [{{ event.title }}]({{ event.url }})
+{{ event.start.strftime("%I:%M %p") }} ‒ {{ event.end.strftime("%I:%M %p") }} (<time:{{ event.start.isoformat() }}> ‒ <time:{{ event.start.isoformat() }}>)
+
+{% if event.description %}
+{{ event.description | safe }}
+{% endif %}
+{%- if not loop.last %}
+---
+{% endif %}
+{% endfor %}
+

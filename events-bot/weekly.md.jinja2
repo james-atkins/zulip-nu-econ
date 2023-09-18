@@ -1,0 +1,23 @@
+# Events This Week
+
+---
+
+{% for date, events in events_by_date.items() %}
+# :spiral_calendar: {{ date.strftime("%A %-d %B %Y")}}
+
+{% for event in events %}
+## [{{ event.title | safe }}]({{ event.url }})
+
+{{ event.start.strftime("%I:%M %p") }} ‒ {{ event.end.strftime("%I:%M %p") }} (<time:{{ event.start.isoformat() }}> ‒ <time:{{ event.start.isoformat() }}>)
+
+{% if event.description %}
+```spoiler Description
+{{ event.description | safe }}
+```
+{% endif %}
+{% endfor %}
+{%- if not loop.last %}
+---
+{% endif %}
+{% endfor %}
+
