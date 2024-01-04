@@ -114,12 +114,6 @@
             zuliprc.welcome-bot = lib.mkOption {
               type = lib.types.path;
             };
-            zuliprc.calendar-bot = lib.mkOption {
-              type = lib.types.path;
-            };
-            zuliprc.working-papers-bot = lib.mkOption {
-              type = lib.types.path;
-            };
           };
           config = lib.mkIf cfg.enable (lib.mkMerge [
             {
@@ -142,9 +136,6 @@
                 };
               };
             }
-            (makeTimer "events-daily" "${nuzulip'}/bin/events-bot daily" cfg.zuliprc.calendar-bot "08:00")
-            (makeTimer "events-weekly" "${nuzulip'}/bin/events-bot weekly" cfg.zuliprc.calendar-bot "Mon 08:00")
-            (makeTimer "nber-working-papers" "${nuzulip'}/bin/working-papers-bot" cfg.zuliprc.working-papers-bot "Mon 08:00")
           ]);
         };
     };
